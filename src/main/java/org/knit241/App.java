@@ -21,14 +21,14 @@ public class App {
         var masterPasswordHolder = context.getBean(MasterPasswordHolder.class);
         var passwordService = context.getBean(PasswordService.class);
 
-        char[] masterPassword = readPassword("Enter master password: ");
+        char[] masterPassword = readPassword("🔑Введите мастер-пароль: ");
 
         if (masterPasswordHolder.isFirstRun()) {
-            System.out.println("Setting up new master password...");
+            System.out.println("⚙️Установка нового мастер-пароля...");
             masterPasswordHolder.setPassword(masterPassword);
         } else {
             if (!masterPasswordHolder.validateHash(masterPassword)) {
-                System.err.println("Wrong master password!");
+                System.err.println("❌Неверный мастер-пароль!");
                 System.exit(1);
             }
             masterPasswordHolder.setPassword(masterPassword);
@@ -39,11 +39,11 @@ public class App {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("1. Add password\n2. View passwords\n3. Copy password\n4. Exit");
+            System.out.println("1. ✙Добавить пароль\n2. 📜Посмотреть список паролей\n3. 📋Скопировать пароль\n4. 🚪Выход");
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1" -> {
-                    System.out.print("Service: ");
+                    System.out.print("Сервис: ");
                     String service = scanner.nextLine();
                     System.out.print("Username: ");
                     String username = scanner.nextLine();
@@ -54,9 +54,9 @@ public class App {
                 case "2" -> {
                     List<PasswordEntry> entries = passwordService.getAllPasswords();
                     if (entries.isEmpty()) {
-                        System.out.println("No passwords saved yet.");
+                        System.out.println("Пока что нет сохраненных паролей.");
                     } else {
-                        System.out.println("Saved passwords:");
+                        System.out.println("Сохраненные пароли:");
                         for (PasswordEntry entry : entries) {
                             System.out.println("- " + entry.getSite() +
                                     " (login: " + entry.getLogin() + ")");
@@ -64,26 +64,26 @@ public class App {
                     }
                 }
                 case "3" -> {
-                    System.out.print("Service to copy: ");
+                    System.out.print("Сервис для копирования: ");
                     String service = scanner.nextLine();
                     try {
                         String password = passwordService.getPassword(service);
                         if (password != null) {
                             clipboardService.copyToClipboard(password);
-                            System.out.println("Password for " + service +
-                                    " copied to clipboard (will clear in 30 seconds)");
+                            System.out.println("Пароль для сервиса " + service +
+                                    " скопирован в буфер обмена");
                         } else {
-                            System.out.println("Service not found: " + service);
+                            System.out.println("Сервис не найден: " + service);
                         }
                     } catch (Exception e) {
-                        System.err.println("Error copying password: " + e.getMessage());
+                        System.err.println("Ошибка при копировании пароля: " + e.getMessage());
                     }
                 }
                 case "4" -> {
                     passwordService.saveToFile();
                     System.exit(0);
                 }
-                default -> System.out.println("Invalid choice");
+                default -> System.out.println("Неверный выбор");
             }
         }
     }
