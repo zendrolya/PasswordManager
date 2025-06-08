@@ -21,11 +21,10 @@ public class AesEncryptionService implements EncryptionService {
 
     private final MasterPasswordHolder masterPasswordHolder;
     private final SecureRandom secureRandom = new SecureRandom();
-    private byte[] salt; // Храним salt между вызовами
+    private byte[] salt;
 
     public AesEncryptionService(MasterPasswordHolder masterPasswordHolder) {
         this.masterPasswordHolder = masterPasswordHolder;
-        // Инициализируем salt один раз при создании сервиса
         this.salt = new byte[SALT_LENGTH];
         secureRandom.nextBytes(this.salt);
     }
@@ -53,7 +52,6 @@ public class AesEncryptionService implements EncryptionService {
             cipher.init(Cipher.ENCRYPT_MODE, getKey(), ivSpec);
             byte[] encrypted = cipher.doFinal(plainText.getBytes());
 
-            // Сохраняем salt, iv и зашифрованные данные вместе
             byte[] combined = new byte[SALT_LENGTH + IV_LENGTH + encrypted.length];
             System.arraycopy(salt, 0, combined, 0, SALT_LENGTH);
             System.arraycopy(iv, 0, combined, SALT_LENGTH, IV_LENGTH);
@@ -82,7 +80,6 @@ public class AesEncryptionService implements EncryptionService {
             System.arraycopy(combined, SALT_LENGTH, iv, 0, IV_LENGTH);
             System.arraycopy(combined, SALT_LENGTH + IV_LENGTH, encrypted, 0, encrypted.length);
 
-            // Временно устанавливаем salt для дешифрования
             byte[] originalSalt = this.salt;
             this.salt = salt;
 
@@ -93,7 +90,6 @@ public class AesEncryptionService implements EncryptionService {
                 byte[] decrypted = cipher.doFinal(encrypted);
                 return new String(decrypted);
             } finally {
-                // Восстанавливаем оригинальный salt
                 this.salt = originalSalt;
             }
         } catch (Exception e) {
