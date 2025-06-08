@@ -56,12 +56,11 @@ public class PasswordService {
 
     public List<PasswordEntry> getAllPasswords() {
         return repository.findAll().stream()
-                .map(PasswordEntry::new) // копируем для защиты от изменений
+                .map(PasswordEntry::new)
                 .collect(Collectors.toList());
     }
 
     public String getPassword(String site) {
-        // Trim and normalize case for lookup
         String lookupKey = site.trim().toLowerCase();
 
         Optional<PasswordEntry> entry = repository.findAll().stream()
